@@ -23,7 +23,7 @@ declare(strict_types = 1);
 
 namespace vennv\vapm\express\router;
 
-use vennv\vapm\express\Express;
+use vennv\vapm\express\application\App;
 use vennv\vapm\express\data\JsonData;
 use vennv\vapm\express\data\RouterData;
 use vennv\vapm\express\data\StaticData;
@@ -271,11 +271,11 @@ class Router implements RouterInterface {
         $countParams = count($middleWare->params);
         $childPaths = iterator_to_array(Utils::splitStringBySlash($path));
         $params = array_map(
-            /**
-             * @param int|string $index
-             * @param mixed $path
-             * @return string|null
-             */
+        /**
+         * @param int|string $index
+         * @param mixed $path
+         * @return string|null
+         */
             function (int|string $index, mixed $path) use ($middleWare, &$requireA, &$requireB, &$countParams) : ?string {
                 if (!is_string($path) || !is_int($index)) {
                     return null;
@@ -342,7 +342,7 @@ class Router implements RouterInterface {
     }
 
     /**
-     * @param Express $express
+     * @param App $app
      * @param Socket $client
      * @param string $path
      * @param string $dataClient
@@ -352,20 +352,20 @@ class Router implements RouterInterface {
      * @return array<int, Request|Response>
      */
     public function getCallbackFromRequest(
-        Express $express,
-        Socket  $client,
-        string  $path,
-        string  $dataClient,
-        string  $method,
-        array   $params = [],
-        array   $queries = []
+        App    $app,
+        Socket $client,
+        string $path,
+        string $dataClient,
+        string $method,
+        array  $params = [],
+        array  $queries = []
     ) : array {
         $response = new Response(
-            $express, $client, $path, $method, $params
+            $app, $client, $path, $method, $params
         );
 
         $request = new Request(
-            $response, $express, $client, $path, $dataClient, $method, $params, $queries
+            $response, $app, $client, $path, $dataClient, $method, $params, $queries
         );
 
         return [$request, $response];
@@ -462,7 +462,7 @@ class Router implements RouterInterface {
     }
 
     /**
-     * @param Express $express
+     * @param App $app
      * @param string $path
      * @param Request $request
      * @param Response $response
@@ -474,7 +474,7 @@ class Router implements RouterInterface {
      * @throws Throwable
      */
     public function processWorks(
-        Express  $express,
+        App      $app,
         string   $path,
         Request  &$request,
         Response &$response,
@@ -484,7 +484,7 @@ class Router implements RouterInterface {
         array    $finalRequest
     ) : Async {
         return new Async(function () use (
-            $express, $path, &$request, &$response, $client, $data, $method, $finalRequest
+            $app, $path, &$request, &$response, $client, $data, $method, $finalRequest
         ) : void {
             $queries = iterator_to_array($this->processQueries($path));
             $path = parse_url($path, PHP_URL_PATH);
@@ -520,7 +520,7 @@ class Router implements RouterInterface {
                     foreach ($this->middlewares[$pth] as $middleware) {
                         if ($middleware instanceof Router) {
                             Async::await($middleware->processWorks(
-                                $express, $path, $request, $response, $client, $data, $method, $finalRequest
+                                $app, $path, $request, $response, $client, $data, $method, $finalRequest
                             ));
                         }
                     }

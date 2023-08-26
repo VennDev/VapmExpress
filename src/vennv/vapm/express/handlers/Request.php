@@ -23,7 +23,7 @@ declare(strict_types = 1);
 
 namespace vennv\vapm\express\handlers;
 
-use vennv\vapm\express\Express;
+use vennv\vapm\express\application\App;
 use vennv\vapm\http\Protocol;
 use vennv\vapm\http\Status;
 use vennv\vapm\simultaneous\Error;
@@ -109,7 +109,7 @@ final class Request implements RequestInterface {
 
     private Response $response;
 
-    private Express $express;
+    private App $app;
 
     private Socket $client;
 
@@ -140,7 +140,7 @@ final class Request implements RequestInterface {
 
     /**
      * @param Response $response
-     * @param Express $express
+     * @param App $app
      * @param Socket $client
      * @param string $path
      * @param string $dataClient
@@ -150,7 +150,7 @@ final class Request implements RequestInterface {
      */
     public function __construct(
         Response $response,
-        Express  $express,
+        App      $app,
         Socket   $client,
         string   $path,
         string   $dataClient,
@@ -159,7 +159,7 @@ final class Request implements RequestInterface {
         array    $queries = []
     ) {
         $this->response = $response;
-        $this->express = $express;
+        $this->app = $app;
         $this->client = $client;
         $this->path = $path;
         $this->dataClient = $dataClient;
@@ -195,7 +195,7 @@ final class Request implements RequestInterface {
      */
     private function encodeArray(array $array) : mixed {
         $encode = json_encode($array);
-        if ($this->express->getOptionsJson()->enable && $encode !== false) {
+        if ($this->app->getOptionsJson()->enable && $encode !== false) {
             return json_decode($encode);
         } else {
             return $this->params;
@@ -282,7 +282,7 @@ final class Request implements RequestInterface {
             }
         }
 
-        $options = $this->express->getOptionsJson();
+        $options = $this->app->getOptionsJson();
 
         if (Utils::getBytes($data) > $options->limit) {
             return Error::PAYLOAD_TOO_LARGE;

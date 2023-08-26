@@ -23,6 +23,7 @@ declare(strict_types = 1);
 
 namespace vennv\vapm\express\handlers;
 
+use vennv\vapm\express\application\App;
 use vennv\vapm\express\Express;
 use vennv\vapm\http\Protocol;
 use vennv\vapm\http\Status;
@@ -141,7 +142,7 @@ interface ResponseInterface {
 
 final class Response implements ResponseInterface {
 
-    protected Express $express;
+    protected App $app;
 
     private Socket $client;
 
@@ -164,20 +165,20 @@ final class Response implements ResponseInterface {
     private array $params;
 
     /**
-     * @param Express $express
+     * @param App $app
      * @param Socket $client
      * @param string $path
      * @param string $method
      * @param array<int|float|string, mixed> $params
      */
     public function __construct(
-        Express $express,
-        Socket  $client,
-        string  $path,
-        string  $method = '',
-        array   $params = []
+        App    $app,
+        Socket $client,
+        string $path,
+        string $method = '',
+        array  $params = []
     ) {
-        $this->express = $express;
+        $this->app = $app;
         $this->client = $client;
         $this->method = $method;
         $this->path = $path;
@@ -218,11 +219,11 @@ final class Response implements ResponseInterface {
         $protocol = $this->protocol;
         $status = $this->status;
         $statusName = Status::getStatusName($status);
-        $optionsStatic = $this->express->getOptionsStatic();
+        $optionsStatic = $this->app->getOptionsStatic();
 
         $hasDirect = false;
         if ($optionsStatic->enable) {
-            $file = $this->express->path() . $path;
+            $file = $this->app->path() . $path;
 
             if (is_callable($optionsStatic->setHeaders)) {
                 call_user_func($optionsStatic->setHeaders, $this, $path, stat($file));
@@ -245,14 +246,14 @@ final class Response implements ResponseInterface {
             $options[] = 'Cache-Control: max-age=' . $optionsStatic->maxAge;
 
             if ($optionsStatic->redirect && is_dir($file)) {
-                $options[] = 'Location: ' . $this->express->getUrl() . '/';
+                $options[] = 'Location: ' . $this->app->getUrl() . '/';
                 $options[] = 'Connection: close';
                 $hasDirect = true;
             }
         }
 
         if ($status === Status::FOUND && !$hasDirect) {
-            $options[] = 'Location: ' . $this->express->getUrl() . $path;
+            $options[] = 'Location: ' . $this->app->getUrl() . $path;
             $options[] = 'Connection: close';
         }
 
