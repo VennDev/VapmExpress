@@ -237,22 +237,15 @@ final class App extends Router implements AppInterface
 
         $options = $this->getOptionsStatic();
 
-        if ($options->dotfiles === 'deny') {
-            return;
-        }
+        if ($options->dotfiles === 'deny') return;
 
         foreach ($options->extensions as $extension) {
             // check have . in extension
-            if (!str_contains($extension, '.')) {
-                $extension = '.' . $extension;
-            }
-
+            if (!str_contains($extension, '.')) $extension = '.' . $extension;
             $dotFiles[$extension] = TypeData::ALL;
         }
 
-        if ($options->dotfiles === 'allow') {
-            $dotFiles = array_merge($dotFiles, TypeData::DOT_FILES_MORE);
-        }
+        if ($options->dotfiles === 'allow') $dotFiles = array_merge($dotFiles, TypeData::DOT_FILES_MORE);
 
         /**
          * @var string $dotFile
