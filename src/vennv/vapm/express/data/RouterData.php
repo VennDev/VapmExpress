@@ -19,13 +19,14 @@
  * GNU General Public License for more details.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace vennv\vapm\express\data;
 
 use vennv\vapm\utils\Property;
 
-final class RouterData {
+final class RouterData
+{
 
     use Property;
 

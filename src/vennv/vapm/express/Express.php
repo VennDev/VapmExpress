@@ -19,7 +19,7 @@
  * GNU General Public License for more details.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace vennv\vapm\express;
 
@@ -28,36 +28,40 @@ use vennv\vapm\express\router\Router;
 use Exception;
 
 /**
- * This is version 1.0.0-ALPHA15 of Express
+ * This is version 1.0.0-ALPHA16 of Express
  * This is version still in development, so it is not recommended to use it in production
  */
-interface ExpressInterface {
+interface ExpressInterface
+{
 
     /**
      * @return App
      *
      * This method returns the application
      */
-    public function getApplication() : App;
+    public function getApplication(): App;
 
     /**
      * @return Router
      *
      * This method will return the new router of the server
      */
-    public function router() : Router;
+    public function router(): Router;
 
 }
 
-final class Express implements ExpressInterface {
+final class Express implements ExpressInterface
+{
 
     private ?App $app;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->app = new App();
     }
 
-    public function getApplication() : App {
+    public function getApplication(): App
+    {
         return $this->app;
     }
 
@@ -65,7 +69,8 @@ final class Express implements ExpressInterface {
      * @param array<string, mixed> $options
      * @throws Exception
      */
-    public function router(array $options = []) : Router {
+    public function router(array $options = []): Router
+    {
         return new Router($options);
     }
 

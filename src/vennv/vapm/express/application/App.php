@@ -19,7 +19,7 @@
  * GNU General Public License for more details.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace vennv\vapm\express\application;
 
@@ -51,14 +51,15 @@ use const AF_INET;
 use const SOCK_STREAM;
 use const SOL_TCP;
 
-interface AppInterface {
+interface AppInterface
+{
 
     /**
      * @return string
      *
      * This method will return the url of the server
      */
-    public function getUrl() : string;
+    public function getUrl(): string;
 
     /**
      * @param array<string, mixed> $options
@@ -66,7 +67,7 @@ interface AppInterface {
      *
      * This is a built-in middleware function in Express. It parses incoming requests with JSON payloads and is based on body-parser.
      */
-    public function json(array $options = ['enable' => true]) : callable;
+    public function json(array $options = ['enable' => true]): callable;
 
     /**
      * @param array<string, mixed> $options
@@ -74,88 +75,89 @@ interface AppInterface {
      *
      * This is a built-in middleware function in Express. It parses incoming requests with urlencoded payloads and is based on body-parser.
      */
-    public function static(array $options = ['enable' => true]) : callable;
+    public function static(array $options = ['enable' => true]): callable;
 
     /**
      * @return string
      *
      * This method will return the address of the server
      */
-    public function getAddresses() : string;
+    public function getAddresses(): string;
 
     /**
      * @param string $address
      *
      * This method will set the address of the server
      */
-    public function setAddresses(string $address) : void;
+    public function setAddresses(string $address): void;
 
     /**
      * @return int
      *
      * This method will return the port of the server
      */
-    public function getPort() : int;
+    public function getPort(): int;
 
     /**
      * @return Socket|null
      *
      * This method will return the socket of the server
      */
-    public function getSockets() : ?Socket;
+    public function getSockets(): ?Socket;
 
     /**
      * @return string
      *
      * This method will return the path of the server
      */
-    public function path() : string;
+    public function path(): string;
 
     /**
      * @param string $path
      *
      * This method will set the path of the server
      */
-    public function setPath(string $path) : void;
+    public function setPath(string $path): void;
 
     /**
      * @return void
      *
      * This method will enable the server
      */
-    public function enable() : void;
+    public function enable(): void;
 
     /**
      * @return bool
      *
      * This method will return the status of the server is enabled or not
      */
-    public function enabled() : bool;
+    public function enabled(): bool;
 
     /**
      * @return void
      *
      * This method will disable the server
      */
-    public function disable() : void;
+    public function disable(): void;
 
     /**
      * @return bool
      *
      * This method will return the status of the server is disabled or not
      */
-    public function disabled() : bool;
+    public function disabled(): bool;
 
     /**
      * @throws Throwable
      *
      * This method will start the server
      */
-    public function listen(int $port, callable $callback) : void;
+    public function listen(int $port, callable $callback): void;
 
 }
 
-final class App extends Router implements AppInterface {
+final class App extends Router implements AppInterface
+{
 
     public const LENGTH_BUFFER = 1024; // The length of the buffer to read the data
 
@@ -167,24 +169,25 @@ final class App extends Router implements AppInterface {
 
     private ?Socket $socket = null;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
     }
 
-    public function getUrl() : string {
+    public function getUrl(): string
+    {
         return 'http://' . self::$address . ':' . self::$port;
     }
 
     /**
      * @param array<string, mixed> $options
      */
-    private function getCallbackUpdateOptions(string $name, array $options) : callable {
-        return function ($request, $response, $next) use ($name, $options) : mixed {
+    private function getCallbackUpdateOptions(string $name, array $options): callable
+    {
+        return function ($request, $response, $next) use ($name, $options): mixed {
             $last = $this->options[$name];
 
-            if ($last instanceof JsonData || $last instanceof StaticData) {
-                $this->options[$name] = $last->update($last, $options);
-            }
+            if ($last instanceof JsonData || $last instanceof StaticData) $this->options[$name] = $last->update($last, $options);
 
             return $next();
         };
@@ -193,34 +196,41 @@ final class App extends Router implements AppInterface {
     /**
      * @param array<string, mixed> $options
      */
-    public function json(array $options = ['enable' => true]) : callable {
+    public function json(array $options = ['enable' => true]): callable
+    {
         return $this->getCallbackUpdateOptions('json', $options);
     }
 
     /**
      * @param array<string, mixed> $options
      */
-    public function static(array $options = ['enable' => true]) : callable {
+    public function static(array $options = ['enable' => true]): callable
+    {
         return $this->getCallbackUpdateOptions('static', $options);
     }
 
-    public function getAddresses() : string {
+    public function getAddresses(): string
+    {
         return self::$address;
     }
 
-    public function setAddresses(string $address) : void {
+    public function setAddresses(string $address): void
+    {
         self::$address = $address;
     }
 
-    public function getPort() : int {
+    public function getPort(): int
+    {
         return self::$port;
     }
 
-    public function getSockets() : ?Socket {
+    public function getSockets(): ?Socket
+    {
         return $this->socket;
     }
 
-    public function setPath(string $path) : void {
+    public function setPath(string $path): void
+    {
         $this->path = $path;
 
         $dotFiles = TypeData::DOT_FILES_IGNORE;
@@ -260,19 +270,23 @@ final class App extends Router implements AppInterface {
         }
     }
 
-    public function enable() : void {
+    public function enable(): void
+    {
         $this->enable = true;
     }
 
-    public function enabled() : bool {
+    public function enabled(): bool
+    {
         return $this->enable;
     }
 
-    public function disable() : void {
+    public function disable(): void
+    {
         $this->enable = false;
     }
 
-    public function disabled() : bool {
+    public function disabled(): bool
+    {
         return !$this->enable;
     }
 
@@ -280,7 +294,8 @@ final class App extends Router implements AppInterface {
      * @param string $data
      * @return array<int, mixed>
      */
-    private function getRequestData(string $data) : array {
+    private function getRequestData(string $data): array
+    {
         $data = explode("\r\n", $data);
 
         $dataRequest = explode(' ', $data[0]);
@@ -301,26 +316,21 @@ final class App extends Router implements AppInterface {
     /**
      * @throws Throwable
      */
-    public function listen(int $port, callable $callback) : void {
+    public function listen(int $port, callable $callback): void
+    {
         self::$port = $port;
 
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 
-        if ($socket === false) {
-            throw new RuntimeException(Error::ERROR_TO_CREATE_SOCKET);
-        }
+        if ($socket === false) throw new RuntimeException(Error::ERROR_TO_CREATE_SOCKET);
 
         socket_set_option($socket, SOL_SOCKET, SO_REUSEADDR, 1);
 
         $bind = socket_bind($socket, self::$address, $port);
-        if ($bind === false) {
-            throw new RuntimeException(socket_strerror(socket_last_error($socket)));
-        }
+        if ($bind === false) throw new RuntimeException(socket_strerror(socket_last_error($socket)));
 
         $listen = socket_listen($socket, 1);
-        if ($listen === false) {
-            throw new RuntimeException(socket_strerror(socket_last_error($socket)));
-        }
+        if ($listen === false) throw new RuntimeException(socket_strerror(socket_last_error($socket)));
 
         socket_set_nonblock($socket);
 
@@ -328,12 +338,12 @@ final class App extends Router implements AppInterface {
 
         call_user_func($callback);
 
-        System::setInterval(function () : void {
+        System::setInterval(function (): void {
             if ($this->enable) {
                 $client = socket_accept($this->socket);
 
                 if ($client !== false) {
-                    new Async(function () use ($client) : void {
+                    new Async(function () use ($client): void {
                         $data = socket_read($client, self::LENGTH_BUFFER);
 
                         if ($data !== false) {

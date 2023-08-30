@@ -19,7 +19,7 @@
  * GNU General Public License for more details.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace vennv\vapm\express\router;
 
@@ -56,7 +56,8 @@ use function parse_url;
 use function iterator_to_array;
 use const PHP_URL_PATH;
 
-interface RouterInterface {
+interface RouterInterface
+{
 
     /**
      * @param string $path
@@ -64,7 +65,7 @@ interface RouterInterface {
      *
      * This method will register a route with method GET
      */
-    public function get(string $path, mixed ...$args) : void;
+    public function get(string $path, mixed ...$args): void;
 
     /**
      * @param string $path
@@ -72,7 +73,7 @@ interface RouterInterface {
      *
      * This method will register a route with method POST
      */
-    public function post(string $path, mixed ...$args) : void;
+    public function post(string $path, mixed ...$args): void;
 
     /**
      * @param string $path
@@ -80,7 +81,7 @@ interface RouterInterface {
      *
      * This method will register a route with method PUT
      */
-    public function put(string $path, mixed ...$args) : void;
+    public function put(string $path, mixed ...$args): void;
 
     /**
      * @param string $path
@@ -88,32 +89,33 @@ interface RouterInterface {
      *
      * This method will register a route with method ALL
      */
-    public function all(string $path, mixed ...$args) : void;
+    public function all(string $path, mixed ...$args): void;
 
     /**
      * @param string|callable|Router ...$args
      *
      * This method will register a middleware
      */
-    public function use(string|callable|Router ...$args) : void;
+    public function use(string|callable|Router ...$args): void;
 
     /**
      * @return JsonData
      *
      * This method will return the json data of the server
      */
-    public function getOptionsJson() : JsonData;
+    public function getOptionsJson(): JsonData;
 
     /**
      * @return StaticData
      *
      * This method will return the static data of the server
      */
-    public function getOptionsStatic() : StaticData;
+    public function getOptionsStatic(): StaticData;
 
 }
 
-class Router implements RouterInterface {
+class Router implements RouterInterface
+{
 
     public const NEXT = 'next';
 
@@ -143,7 +145,8 @@ class Router implements RouterInterface {
      * @param array<string, mixed> $options
      * @throws Exception
      */
-    public function __construct(array $options = []) {
+    public function __construct(array $options = [])
+    {
         $this->options['static'] = new StaticData();
         $this->options['json'] = new JsonData();
 
@@ -161,12 +164,11 @@ class Router implements RouterInterface {
      * @param mixed ...$args
      * @return array<int, mixed>
      */
-    private function getResults(string $path, mixed ...$args) : array {
+    private function getResults(string $path, mixed ...$args): array
+    {
         $options = $this->routerData;
 
-        if ($options->caseSensitive) {
-            $path = strtolower($path);
-        }
+        if ($options->caseSensitive) $path = strtolower($path);
 
         $lastArg = $args[count($args) - 1];
 
@@ -195,7 +197,8 @@ class Router implements RouterInterface {
         return [$path, $params, $callback, $canDo];
     }
 
-    private function createRoute(string $method, string $path, mixed ...$args) : ?Route {
+    private function createRoute(string $method, string $path, mixed ...$args): ?Route
+    {
         /**
          * @var string $path
          * @var array<int, string> $params
@@ -204,53 +207,50 @@ class Router implements RouterInterface {
          */
         [$path, $params, $callback, $canDo] = $this->getResults($path, ...$args);
 
-        if ($canDo) {
-            return new Route($method, $path, $callback, $params);
-        }
+        if ($canDo) return new Route($method, $path, $callback, $params);
 
         return null;
     }
 
-    private function registerRoute(string $method, string $path, mixed ...$args) : void {
+    private function registerRoute(string $method, string $path, mixed ...$args): void
+    {
         $route = $this->createRoute($method, $path, ...$args);
-
-        if ($route instanceof Route) {
-            $this->routes[$route->getPath()] = $route;
-        }
+        if ($route instanceof Route) $this->routes[$route->getPath()] = $route;
     }
 
     /**
      * @return array<string, mixed>
      */
-    private function getOptions() : array {
+    private function getOptions(): array
+    {
         return $this->options;
     }
 
-    public function path() : string {
+    public function path(): string
+    {
         return $this->path;
     }
 
-    public function getOptionsJson() : JsonData {
+    public function getOptionsJson(): JsonData
+    {
         $result = $this->getOptions()['json'];
 
-        if (!$result instanceof JsonData) {
-            throw new RuntimeException('Invalid json options');
-        }
+        if (!$result instanceof JsonData) throw new RuntimeException('Invalid json options');
 
         return $result;
     }
 
-    public function getOptionsStatic() : StaticData {
+    public function getOptionsStatic(): StaticData
+    {
         $result = $this->getOptions()['static'];
 
-        if (!$result instanceof StaticData) {
-            throw new RuntimeException('Invalid static options');
-        }
+        if (!$result instanceof StaticData) throw new RuntimeException('Invalid static options');
 
         return $result;
     }
 
-    private function processQueries(string $path) : Generator {
+    private function processQueries(string $path): Generator
+    {
         $queries = parse_url($path, PHP_URL_QUERY);
 
         if (is_string($queries)) {
@@ -266,7 +266,8 @@ class Router implements RouterInterface {
         }
     }
 
-    private function processRequest(MiddleWare|Route $middleWare, string $path, Request $request) : void {
+    private function processRequest(MiddleWare|Route $middleWare, string $path, Request $request): void
+    {
         $requireA = $requireB = false;
         $countParams = count($middleWare->params);
         $childPaths = iterator_to_array(Utils::splitStringBySlash($path));
@@ -276,10 +277,8 @@ class Router implements RouterInterface {
          * @param mixed $path
          * @return string|null
          */
-            function (int|string $index, mixed $path) use ($middleWare, &$requireA, &$requireB, &$countParams) : ?string {
-                if (!is_string($path) || !is_int($index)) {
-                    return null;
-                }
+            function (int|string $index, mixed $path) use ($middleWare, &$requireA, &$requireB, &$countParams): ?string {
+                if (!is_string($path) || !is_int($index)) return null;
 
                 $requireC = $this->path != $path && $middleWare->path != $path;
 
@@ -317,25 +316,17 @@ class Router implements RouterInterface {
      * @param bool $canNext
      * @return bool
      */
-    private function processMiddleware(string $path, mixed $middleWare, Request $request, Response $response, bool &$canNext) : bool {
-        if (!$middleWare instanceof MiddleWare) {
-            return false;
-        }
+    private function processMiddleware(string $path, mixed $middleWare, Request $request, Response $response, bool &$canNext): bool
+    {
+        if (!$middleWare instanceof MiddleWare) return false;
 
-        if (!$this->getOptionsStatic()->fallthrough) {
-            if (!file_exists($this->path())) {
-                return false;
-            }
-        }
+        if (!$this->getOptionsStatic()->fallthrough && !file_exists($this->path())) return false;
 
         $this->processRequest($middleWare, $path, $request);
 
         if (is_callable($middleWare->callback)) {
             $dataCallBack = call_user_func($middleWare->callback, $request, $response, fn() => self::NEXT);
-
-            if ($dataCallBack !== self::NEXT) {
-                return $canNext = false;
-            }
+            if ($dataCallBack !== self::NEXT) return $canNext = false;
         }
 
         return true;
@@ -359,7 +350,8 @@ class Router implements RouterInterface {
         string $method,
         array  $params = [],
         array  $queries = []
-    ) : array {
+    ): array
+    {
         $response = new Response(
             $app, $client, $path, $method, $params
         );
@@ -388,10 +380,11 @@ class Router implements RouterInterface {
         string   &$path,
         string   $method,
         array    $queries = []
-    ) : Async {
+    ): Async
+    {
         return new Async(function () use (
             &$request, &$response, $route, &$path, $method, $queries
-        ) : void {
+        ): void {
             $callback = $route->getCallback();
             $methodRequire = $route->getMethod();
 
@@ -399,9 +392,7 @@ class Router implements RouterInterface {
 
             $this->processRequest($route, $path, $request);
 
-            if ($methodRequire === $method || $methodRequire === Method::ALL) {
-                Async::await(call_user_func($callback, $request, $response));
-            }
+            if ($methodRequire === $method || $methodRequire === Method::ALL) Async::await(call_user_func($callback, $request, $response));
         });
     }
 
@@ -418,10 +409,11 @@ class Router implements RouterInterface {
         Request  &$request,
         Response &$response,
         bool     &$canNext
-    ) : Async {
+    ): Async
+    {
         return new Async(function () use (
             $path, &$request, &$response, &$canNext
-        ) : void {
+        ): void {
             foreach ($this->middlewares['*'] as $middleware) {
                 $this->processMiddleware($path, $middleware, $request, $response, $canNext);
             }
@@ -430,9 +422,7 @@ class Router implements RouterInterface {
                 foreach ($this->middlewares[$path] as $middleware) {
                     $result = $this->processMiddleware($path, $middleware, $request, $response, $canNext);
 
-                    if (!$result) {
-                        break;
-                    }
+                    if (!$result) break;
                 }
             }
 
@@ -452,9 +442,7 @@ class Router implements RouterInterface {
 
                         $result = $this->processMiddleware($path, $middleware, $request, $response, $canNext);
 
-                        if (!$result) {
-                            break;
-                        }
+                        if (!$result) break;
                     }
                 }
             }
@@ -482,10 +470,11 @@ class Router implements RouterInterface {
         string   $data,
         string   $method,
         array    $finalRequest
-    ) : Async {
+    ): Async
+    {
         return new Async(function () use (
             $app, $path, &$request, &$response, $client, $data, $method, $finalRequest
-        ) : void {
+        ): void {
             $queries = iterator_to_array($this->processQueries($path));
             $path = parse_url($path, PHP_URL_PATH);
 
@@ -529,35 +518,38 @@ class Router implements RouterInterface {
         });
     }
 
-    public function get(string $path, mixed ...$args) : void {
+    public function get(string $path, mixed ...$args): void
+    {
         $this->registerRoute(Method::GET, $path, ...$args);
     }
 
-    public function post(string $path, mixed ...$args) : void {
+    public function post(string $path, mixed ...$args): void
+    {
         $this->registerRoute(Method::POST, $path, ...$args);
     }
 
-    public function put(string $path, mixed ...$args) : void {
+    public function put(string $path, mixed ...$args): void
+    {
         $this->registerRoute(Method::PUT, $path, ...$args);
     }
 
-    public function all(string $path, mixed ...$args) : void {
+    public function all(string $path, mixed ...$args): void
+    {
         $this->registerRoute(Method::ALL, $path, ...$args);
     }
 
     /**
      * @param string|callable|Router ...$args
      */
-    public function use(string|callable|Router ...$args) : void {
+    public function use(string|callable|Router ...$args): void
+    {
         if (is_callable($args[0])) {
             $this->middlewares['*'][] = new MiddleWare('*', $args[0], []);
         } else {
             $path = $args[0];
             $param = $args[1];
 
-            if (!is_string($path)) {
-                return;
-            }
+            if (!is_string($path)) return;
 
             /**
              * @var string $pathOther
@@ -570,18 +562,14 @@ class Router implements RouterInterface {
             if (count($params) > 0 && $canDo) {
                 $this->middlewares[$pathOther][] = new MiddleWare($pathOther, $callback, $params);
             } else if (count($params) <= 0) {
-                if (!isset($this->middlewares[$path])) {
-                    $this->middlewares[$path] = [];
-                }
+                if (!isset($this->middlewares[$path])) $this->middlewares[$path] = [];
 
                 if ($param instanceof Router) {
                     $param->path = $path;
                     $this->middlewares[$path][] = $param;
                 }
 
-                if (is_callable($param)) {
-                    $this->middlewares[$path][] = new MiddleWare($path, $param);
-                }
+                if (is_callable($param)) $this->middlewares[$path][] = new MiddleWare($path, $param);
             }
         }
     }

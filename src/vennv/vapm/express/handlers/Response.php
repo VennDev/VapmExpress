@@ -19,7 +19,7 @@
  * GNU General Public License for more details.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace vennv\vapm\express\handlers;
 
@@ -51,26 +51,27 @@ use function stat;
 use function md5;
 use const PATHINFO_EXTENSION;
 
-interface ResponseInterface {
+interface ResponseInterface
+{
 
-    public function getClient() : Socket;
+    public function getClient(): Socket;
 
-    public function getMethod() : string;
+    public function getMethod(): string;
 
-    public function getPath() : string;
+    public function getPath(): string;
 
-    public function getProtocol() : string;
+    public function getProtocol(): string;
 
-    public function getStatus() : int;
+    public function getStatus(): int;
 
-    public function status(int $status) : ResponseInterface;
+    public function status(int $status): ResponseInterface;
 
     /**
      * @param string $key
      * @param string $value
      * @return void;
      */
-    public function setHeader(string $key, string $value) : void;
+    public function setHeader(string $key, string $value): void;
 
     /**
      * @param string $path
@@ -80,67 +81,68 @@ interface ResponseInterface {
      * @return AsyncInterface
      * @throws Throwable
      */
-    public function render(string $path, bool $usePath = true, bool $justActive = false, array $options = ['Content-Type: text/html']) : AsyncInterface;
+    public function render(string $path, bool $usePath = true, bool $justActive = false, array $options = ['Content-Type: text/html']): AsyncInterface;
 
     /**
      * @throws Throwable
      */
-    public function active(string $path) : AsyncInterface;
+    public function active(string $path): AsyncInterface;
 
     /**
      * @throws Throwable
      */
-    public function redirect(string $path, int $status = Status::FOUND) : AsyncInterface;
+    public function redirect(string $path, int $status = Status::FOUND): AsyncInterface;
 
     /**
      * @throws Throwable
      */
-    public function send(string $data, int $status = Status::OK) : AsyncInterface;
+    public function send(string $data, int $status = Status::OK): AsyncInterface;
 
     /**
      * @param array<int|float|string, mixed> $data
      * @throws Throwable
      */
-    public function json(array $data, int $status = Status::OK) : AsyncInterface;
+    public function json(array $data, int $status = Status::OK): AsyncInterface;
 
     /**
      * @throws Throwable
      */
-    public function download(string $path, int $status = Status::OK) : AsyncInterface;
+    public function download(string $path, int $status = Status::OK): AsyncInterface;
 
     /**
      * @throws Throwable
      */
-    public function file(string $path, int $status = Status::OK) : AsyncInterface;
+    public function file(string $path, int $status = Status::OK): AsyncInterface;
 
     /**
      * @throws Throwable
      */
-    public function image(string $path, int $status = Status::OK) : AsyncInterface;
+    public function image(string $path, int $status = Status::OK): AsyncInterface;
 
     /**
      * @throws Throwable
      */
-    public function video(string $path, int $status = Status::OK) : AsyncInterface;
+    public function video(string $path, int $status = Status::OK): AsyncInterface;
 
     /**
      * @param string $key
      * @param string $value
      * @param array<int|float|string, int|float|string> $options
      */
-    public function cookie(string $key, string $value, array $options = []) : void;
+    public function cookie(string $key, string $value, array $options = []): void;
 
     /**
      * @param string $key
      * @param array<int|float|string, int|float|string> $options
      */
-    public function clearCookie(string $key, array $options = []) : void;
+    public function clearCookie(string $key, array $options = []): void;
 
-    public function attachment(string $filename) : void;
+    public function attachment(string $filename): void;
 
 }
 
-final class Response implements ResponseInterface {
+final class Response implements ResponseInterface
+{
 
     protected App $app;
 
@@ -177,7 +179,8 @@ final class Response implements ResponseInterface {
         string $path,
         string $method = '',
         array  $params = []
-    ) {
+    )
+    {
         $this->app = $app;
         $this->client = $client;
         $this->method = $method;
@@ -185,27 +188,33 @@ final class Response implements ResponseInterface {
         $this->params = $params;
     }
 
-    public function getClient() : Socket {
+    public function getClient(): Socket
+    {
         return $this->client;
     }
 
-    public function getMethod() : string {
+    public function getMethod(): string
+    {
         return $this->method;
     }
 
-    public function getPath() : string {
+    public function getPath(): string
+    {
         return $this->path;
     }
 
-    public function getProtocol() : string {
+    public function getProtocol(): string
+    {
         return $this->protocol;
     }
 
-    public function getStatus() : int {
+    public function getStatus(): int
+    {
         return $this->status;
     }
 
-    public function status(int $status) : self {
+    public function status(int $status): self
+    {
         $this->status = $status;
 
         return $this;
@@ -215,7 +224,8 @@ final class Response implements ResponseInterface {
      * @param string $path
      * @param array<int|float|string, mixed> $options
      */
-    private function buildHeader(string $path, array $options = ['Content-Type: text/html']) : void {
+    private function buildHeader(string $path, array $options = ['Content-Type: text/html']): void
+    {
         $protocol = $this->protocol;
         $status = $this->status;
         $statusName = Status::getStatusName($status);
@@ -225,9 +235,7 @@ final class Response implements ResponseInterface {
         if ($optionsStatic->enable) {
             $file = $this->app->path() . $path;
 
-            if (is_callable($optionsStatic->setHeaders)) {
-                call_user_func($optionsStatic->setHeaders, $this, $path, stat($file));
-            }
+            if (is_callable($optionsStatic->setHeaders)) call_user_func($optionsStatic->setHeaders, $this, $path, stat($file));
 
             if ($optionsStatic->immutable) {
                 $options[] = 'Cache-Control: immutable';
@@ -278,7 +286,8 @@ final class Response implements ResponseInterface {
      * @param string $key
      * @param string $value
      */
-    public function setHeader(string $key, string $value) : void {
+    public function setHeader(string $key, string $value): void
+    {
         $this->headers[] = $key . ': ' . $value;
     }
 
@@ -295,10 +304,11 @@ final class Response implements ResponseInterface {
         bool   $usePath = true,
         bool   $justActive = false,
         array  $options = ['Content-Type: text/html']
-    ) : Async {
+    ): Async
+    {
         if (!$justActive) $this->buildHeader($path, $options);
 
-        return new Async(function () use ($path, $usePath, $justActive) : void {
+        return new Async(function () use ($path, $usePath, $justActive): void {
             ob_start();
 
             if ($usePath) {
@@ -337,14 +347,16 @@ final class Response implements ResponseInterface {
     /**
      * @throws Throwable
      */
-    public function active(string $path) : AsyncInterface {
+    public function active(string $path): AsyncInterface
+    {
         return $this->render($path, true, true);
     }
 
     /**
      * @throws Throwable
      */
-    public function redirect(string $path, int $status = Status::FOUND) : AsyncInterface {
+    public function redirect(string $path, int $status = Status::FOUND): AsyncInterface
+    {
         $this->status = $status;
         return $this->render($path, false);
     }
@@ -352,7 +364,8 @@ final class Response implements ResponseInterface {
     /**
      * @throws Throwable
      */
-    public function send(string $data, int $status = Status::OK) : AsyncInterface {
+    public function send(string $data, int $status = Status::OK): AsyncInterface
+    {
         $this->status = $status;
         return $this->render($data, false);
     }
@@ -361,13 +374,12 @@ final class Response implements ResponseInterface {
      * @param array<int|float|string, mixed> $data
      * @throws Throwable
      */
-    public function json(array $data, int $status = Status::OK) : AsyncInterface {
+    public function json(array $data, int $status = Status::OK): AsyncInterface
+    {
         $this->status = $status;
         $encode = json_encode($data);
 
-        if ($encode === false) {
-            throw new Exception('JSON encode error');
-        }
+        if ($encode === false) throw new Exception('JSON encode error');
 
         return $this->render($encode, false, false, ['Content-Type: application/json']);
     }
@@ -375,7 +387,8 @@ final class Response implements ResponseInterface {
     /**
      * @throws Throwable
      */
-    public function download(string $path, int $status = Status::OK) : AsyncInterface {
+    public function download(string $path, int $status = Status::OK): AsyncInterface
+    {
         $this->status = $status;
         return $this->render($path, true, false, ['Content-Type: application/octet-stream']);
     }
@@ -383,7 +396,8 @@ final class Response implements ResponseInterface {
     /**
      * @throws Throwable
      */
-    public function file(string $path, int $status = Status::OK) : AsyncInterface {
+    public function file(string $path, int $status = Status::OK): AsyncInterface
+    {
         $this->status = $status;
         return $this->render($path, true, false, ['Content-Type: ' . mime_content_type($path)]);
     }
@@ -391,7 +405,8 @@ final class Response implements ResponseInterface {
     /**
      * @throws Throwable
      */
-    public function image(string $path, int $status = Status::OK) : AsyncInterface {
+    public function image(string $path, int $status = Status::OK): AsyncInterface
+    {
         $this->status = $status;
         return $this->render($path, true, false, ['Content-Type: image/' . pathinfo($path, PATHINFO_EXTENSION)]);
     }
@@ -399,7 +414,8 @@ final class Response implements ResponseInterface {
     /**
      * @throws Throwable
      */
-    public function video(string $path, int $status = Status::OK) : AsyncInterface {
+    public function video(string $path, int $status = Status::OK): AsyncInterface
+    {
         $this->status = $status;
         return $this->render($path, true, false, ['Content-Type: video/' . pathinfo($path, PATHINFO_EXTENSION)]);
     }
@@ -409,36 +425,23 @@ final class Response implements ResponseInterface {
      * @param string $value
      * @param array<int|float|string, int|float|string> $options
      */
-    public function cookie(string $key, string $value, array $options = []) : void {
+    public function cookie(string $key, string $value, array $options = []): void
+    {
         $cookie = $key . '=' . $value;
 
-        if (isset($options['expires'])) {
-            $cookie .= '; expires=' . gmdate('D, d M Y H:i:s', $options['expires']) . ' GMT';
-        }
+        if (isset($options['expires'])) $cookie .= '; expires=' . gmdate('D, d M Y H:i:s', $options['expires']) . ' GMT';
 
-        if (isset($options['maxAge'])) {
-            $cookie .= '; Max-Age=' . $options['maxAge'];
-        }
+        if (isset($options['maxAge'])) $cookie .= '; Max-Age=' . $options['maxAge'];
 
-        if (isset($options['domain'])) {
-            $cookie .= '; Domain=' . $options['domain'];
-        }
+        if (isset($options['domain'])) $cookie .= '; Domain=' . $options['domain'];
 
-        if (isset($options['path'])) {
-            $cookie .= '; Path=' . $options['path'];
-        }
+        if (isset($options['path'])) $cookie .= '; Path=' . $options['path'];
 
-        if (isset($options['secure'])) {
-            $cookie .= '; Secure';
-        }
+        if (isset($options['secure'])) $cookie .= '; Secure';
 
-        if (isset($options['httpOnly'])) {
-            $cookie .= '; HttpOnly';
-        }
+        if (isset($options['httpOnly'])) $cookie .= '; HttpOnly';
 
-        if (isset($options['sameSite'])) {
-            $cookie .= '; SameSite=' . $options['sameSite'];
-        }
+        if (isset($options['sameSite'])) $cookie .= '; SameSite=' . $options['sameSite'];
 
         $this->setHeader('Set-Cookie', $cookie);
     }
@@ -447,16 +450,19 @@ final class Response implements ResponseInterface {
      * @param string $key
      * @param array<int|float|string, int|float|string> $options
      */
-    public function clearCookie(string $key, array $options = []) : void {
+    public function clearCookie(string $key, array $options = []): void
+    {
         $options['maxAge'] = 0;
         $this->cookie($key, '', $options);
     }
 
-    public function attachment(string $filename) : void {
+    public function attachment(string $filename): void
+    {
         $this->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"');
     }
 
-    public function end() : void {
+    public function end(): void
+    {
         socket_close($this->client);
     }
 

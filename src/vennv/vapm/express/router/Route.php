@@ -19,7 +19,7 @@
  * GNU General Public License for more details.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace vennv\vapm\express\router;
 
@@ -27,7 +27,8 @@ use RuntimeException;
 use function count;
 use function is_callable;
 
-final class Route {
+final class Route
+{
 
     public string $method;
 
@@ -48,38 +49,38 @@ final class Route {
      * @param callable $callback
      * @param array<int|float|string, mixed> $params
      */
-    public function __construct(string $method, string $path, callable $callback, array $params = []) {
+    public function __construct(string $method, string $path, callable $callback, array $params = [])
+    {
         $this->method = $method;
         $this->path = $path;
         $this->callback = $callback;
         $this->params = $params;
 
-        if (count($params) > 0) {
-            $this->isRouteSpecial = true;
-        }
+        if (count($params) > 0) $this->isRouteSpecial = true;
     }
 
     /**
      * @return string
      */
-    public function getMethod() : string {
+    public function getMethod(): string
+    {
         return $this->method;
     }
 
     /**
      * @return string
      */
-    public function getPath() : string {
+    public function getPath(): string
+    {
         return $this->path;
     }
 
     /**
      * @return callable
      */
-    public function getCallback() : callable {
-        if (!is_callable($this->callback)) {
-            throw new RuntimeException("The callback is not callable");
-        }
+    public function getCallback(): callable
+    {
+        if (!is_callable($this->callback)) throw new RuntimeException("The callback is not callable");
 
         return $this->callback;
     }
@@ -87,14 +88,16 @@ final class Route {
     /**
      * @return array<int|float|string, mixed>
      */
-    public function getParams() : array {
+    public function getParams(): array
+    {
         return $this->params;
     }
 
     /**
      * @return bool
      */
-    public function isRouteSpecial() : bool {
+    public function isRouteSpecial(): bool
+    {
         return $this->isRouteSpecial;
     }
 

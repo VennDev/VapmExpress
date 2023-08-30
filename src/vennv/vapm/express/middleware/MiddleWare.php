@@ -19,11 +19,12 @@
  * GNU General Public License for more details.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace vennv\vapm\express\middleware;
 
-final class MiddleWare {
+final class MiddleWare
+{
 
     public string $path;
 
@@ -39,7 +40,8 @@ final class MiddleWare {
      * @param callable $callback
      * @param array<int|float|string, mixed> $params
      */
-    public function __construct(string $path, callable $callback, array $params = []) {
+    public function __construct(string $path, callable $callback, array $params = [])
+    {
         $this->path = $path;
         $this->callback = $callback;
         $this->params = $params;
