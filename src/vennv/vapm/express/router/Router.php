@@ -185,9 +185,7 @@ class Router implements RouterInterface
                 call_user_func($arg);
             }
 
-            if (is_bool($arg) && $arg === false) {
-                $canDo = false;
-            }
+            if (is_bool($arg) && $arg === false) $canDo = false;
         }
 
         $params = explode('/:', $path);
@@ -259,9 +257,7 @@ class Router implements RouterInterface
             foreach ($explode as $query) {
                 $explodeQuery = explode('=', $query);
 
-                if (count($explodeQuery) === 2) {
-                    yield $explodeQuery[0] => $explodeQuery[1];
-                }
+                if (count($explodeQuery) === 2) yield $explodeQuery[0] => $explodeQuery[1];
             }
         }
     }
@@ -297,14 +293,10 @@ class Router implements RouterInterface
 
         $params = array_filter($params, fn($value) => $value !== null);
 
-        if (!$this->routerData->mergeParams) {
-            $request->params = [];
-        }
+        if (!$this->routerData->mergeParams) $request->params = [];
 
         foreach ($params as $value) {
-            foreach ($middleWare->params as $param) {
-                $request->params[$param] = $value;
-            }
+            foreach ($middleWare->params as $param) $request->params[$param] = $value;
         }
     }
 
@@ -319,7 +311,6 @@ class Router implements RouterInterface
     private function processMiddleware(string $path, mixed $middleWare, Request $request, Response $response, bool &$canNext): bool
     {
         if (!$middleWare instanceof MiddleWare) return false;
-
         if (!$this->getOptionsStatic()->fallthrough && !file_exists($this->path())) return false;
 
         $this->processRequest($middleWare, $path, $request);
@@ -352,13 +343,8 @@ class Router implements RouterInterface
         array  $queries = []
     ): array
     {
-        $response = new Response(
-            $app, $client, $path, $method, $params
-        );
-
-        $request = new Request(
-            $response, $app, $client, $path, $dataClient, $method, $params, $queries
-        );
+        $response = new Response($app, $client, $path, $method, $params);
+        $request = new Request($response, $app, $client, $path, $dataClient, $method, $params, $queries);
 
         return [$request, $response];
     }
@@ -414,9 +400,7 @@ class Router implements RouterInterface
         return new Async(function () use (
             $path, &$request, &$response, &$canNext
         ): void {
-            foreach ($this->middlewares['*'] as $middleware) {
-                $this->processMiddleware($path, $middleware, $request, $response, $canNext);
-            }
+            foreach ($this->middlewares['*'] as $middleware) $this->processMiddleware($path, $middleware, $request, $response, $canNext);
 
             if (isset($this->middlewares[$path])) {
                 foreach ($this->middlewares[$path] as $middleware) {
@@ -487,15 +471,11 @@ class Router implements RouterInterface
 
             $childPaths = iterator_to_array(Utils::splitStringBySlash($path));
             if (isset($this->routes[$path])) {
-                Async::await($this->processRoute(
-                    $request, $response, $this->routes[$path], $path, $method, $queries
-                ));
+                Async::await($this->processRoute($request, $response, $this->routes[$path], $path, $method, $queries));
             } else {
                 foreach ($childPaths as $pth) {
                     if (isset($this->routes[$pth])) {
-                        Async::await($this->processRoute(
-                            $request, $response, $this->routes[$pth], $path, $method, $queries
-                        ));
+                        Async::await($this->processRoute($request, $response, $this->routes[$pth], $path, $method, $queries));
                         break;
                     }
                 }
@@ -508,9 +488,7 @@ class Router implements RouterInterface
                 if (isset($this->middlewares[$pth])) {
                     foreach ($this->middlewares[$pth] as $middleware) {
                         if ($middleware instanceof Router) {
-                            Async::await($middleware->processWorks(
-                                $app, $path, $request, $response, $client, $data, $method, $finalRequest
-                            ));
+                            Async::await($middleware->processWorks($app, $path, $request, $response, $client, $data, $method, $finalRequest));
                         }
                     }
                 }

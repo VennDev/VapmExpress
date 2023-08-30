@@ -204,6 +204,7 @@ final class Request implements RequestInterface
     private function encodeArray(array $array): mixed
     {
         $encode = json_encode($array);
+
         if ($this->app->getOptionsJson()->enable && $encode !== false) {
             return json_decode($encode);
         } else {
@@ -235,9 +236,7 @@ final class Request implements RequestInterface
     {
         $accept = $this->getAccepts();
 
-        if ($accept === null) {
-            return true;
-        }
+        if ($accept === null) return true;
 
         $accept = explode(',', $accept);
 
@@ -296,22 +295,14 @@ final class Request implements RequestInterface
 
         if (Utils::getBytes($data) > $options->limit) return Error::PAYLOAD_TOO_LARGE;
 
-        if ($options->reviver !== null && is_callable($options->reviver)) {
-            foreach ($data as $key => $value) {
-                $data[$key] = call_user_func($options->reviver, $key, $value);
-            }
-        }
+        if ($options->reviver !== null && is_callable($options->reviver)) foreach ($data as $key => $value) $data[$key] = call_user_func($options->reviver, $key, $value);
 
         /**
          * @var array<int, string>|string $data
          */
         $encoding = mb_convert_encoding($data, 'UTF-8');
 
-        if (!$options->strict) {
-            $data = (object)$data;
-        } else {
-            $data = (string)json_encode($data);
-        }
+        !$options->strict ? $data = (object)$data : $data = (string)json_encode($data);
 
         if ($options->verify !== null && is_callable($options->verify)) {
             call_user_func(

@@ -237,9 +237,7 @@ final class Response implements ResponseInterface
 
             if (is_callable($optionsStatic->setHeaders)) call_user_func($optionsStatic->setHeaders, $this, $path, stat($file));
 
-            if ($optionsStatic->immutable) {
-                $options[] = 'Cache-Control: immutable';
-            }
+            if ($optionsStatic->immutable) $options[] = 'Cache-Control: immutable';
 
             if ($optionsStatic->lastModified) {
                 $date = gmdate('D, d M Y H:i:s', time());
@@ -333,10 +331,7 @@ final class Response implements ResponseInterface
                     if (!$justActive) socket_write($this->client, $data);
                 }
             } else {
-                if (!is_string($body)) {
-                    throw new Exception('Body must be string');
-                }
-
+                if (!is_string($body)) throw new Exception('Body must be string');
                 if (!$justActive) socket_write($this->client, $body);
             }
 
