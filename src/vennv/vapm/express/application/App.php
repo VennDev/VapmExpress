@@ -255,7 +255,6 @@ final class App extends Router implements AppInterface
             /** @var string $file */
             foreach (Utils::getAllByDotFile($path, $dotFile) as $file) {
                 $replacePath = str_replace([$path, '\\'], ['', '/'], $file);
-
                 $this->get($replacePath, function ($req, $res) use ($replacePath, $type) {
                     $res->render($replacePath, true, false, ['Content-Type: ' . $type]);
                 });

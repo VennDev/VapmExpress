@@ -204,9 +204,7 @@ class Router implements RouterInterface
          * @var bool $canDo
          */
         [$path, $params, $callback, $canDo] = $this->getResults($path, ...$args);
-
         if ($canDo) return new Route($method, $path, $callback, $params);
-
         return null;
     }
 
@@ -232,25 +230,20 @@ class Router implements RouterInterface
     public function getOptionsJson(): JsonData
     {
         $result = $this->getOptions()['json'];
-
         if (!$result instanceof JsonData) throw new RuntimeException('Invalid json options');
-
         return $result;
     }
 
     public function getOptionsStatic(): StaticData
     {
         $result = $this->getOptions()['static'];
-
         if (!$result instanceof StaticData) throw new RuntimeException('Invalid static options');
-
         return $result;
     }
 
     private function processQueries(string $path): Generator
     {
         $queries = parse_url($path, PHP_URL_QUERY);
-
         if (is_string($queries)) {
             $explode = explode('&', $queries);
 
@@ -279,9 +272,7 @@ class Router implements RouterInterface
                 $requireC = $this->path != $path && $middleWare->path != $path;
 
                 if ($this->path == $path) $requireA = true;
-
                 if ($middleWare->path == $path) $requireB = true;
-
                 if ($requireA && $requireB && $requireC && $countParams > 0) {
                     $countParams--;
                     return str_replace('/', '', $path);
@@ -345,7 +336,6 @@ class Router implements RouterInterface
     {
         $response = new Response($app, $client, $path, $method, $params);
         $request = new Request($response, $app, $client, $path, $dataClient, $method, $params, $queries);
-
         return [$request, $response];
     }
 
@@ -405,7 +395,6 @@ class Router implements RouterInterface
             if (isset($this->middlewares[$path])) {
                 foreach ($this->middlewares[$path] as $middleware) {
                     $result = $this->processMiddleware($path, $middleware, $request, $response, $canNext);
-
                     if (!$result) break;
                 }
             }
@@ -419,7 +408,6 @@ class Router implements RouterInterface
                             for ($i = 0; $i < count($middleware->params); $i++) {
                                 $indexParam = $middleware->params[$i + 1];
                                 $value = $realPaths[$index + $i];
-
                                 $request->params[$indexParam] = !is_array($value) && !is_string($value) ? null : str_replace('/', '', $value);
                             }
                         }

@@ -19,11 +19,12 @@
  * GNU General Public License for more details.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace vennv\vapm\http;
 
-final class Content {
+final class Content
+{
 
     public const CONTENT_TYPE = 'Content-Type';
 

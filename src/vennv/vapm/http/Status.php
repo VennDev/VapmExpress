@@ -19,13 +19,14 @@
  * GNU General Public License for more details.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace vennv\vapm\http;
 
 use ReflectionClass;
 
-final class Status {
+final class Status
+{
 
     public const CONTINUE = 100;
 
@@ -147,7 +148,8 @@ final class Status {
 
     public const NETWORK_AUTHENTICATION_REQUIRED = 511;
 
-    public static function getStatusName(mixed $value) : int|string|null {
+    public static function getStatusName(mixed $value): int|string|null
+    {
         $class = new ReflectionClass(self::class);
         $constants = $class->getConstants();
         $constantName = array_search($value, $constants, true);

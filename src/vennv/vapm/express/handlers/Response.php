@@ -311,14 +311,8 @@ final class Response implements ResponseInterface
 
             if ($usePath) {
                 require_once $this->path . $path;
-
                 $function = str_replace(['/', '.php'], '', $path);
-
-                if (function_exists($function)) {
-                    $body = Async::await($function($this->params));
-                } else {
-                    $body = file_get_contents($this->path . $path);
-                }
+                function_exists($function) ? $body = Async::await($function($this->params)) : $body = file_get_contents($this->path . $path);
             } else {
                 $body = Async::await($path);
             }
@@ -425,17 +419,11 @@ final class Response implements ResponseInterface
         $cookie = $key . '=' . $value;
 
         if (isset($options['expires'])) $cookie .= '; expires=' . gmdate('D, d M Y H:i:s', $options['expires']) . ' GMT';
-
         if (isset($options['maxAge'])) $cookie .= '; Max-Age=' . $options['maxAge'];
-
         if (isset($options['domain'])) $cookie .= '; Domain=' . $options['domain'];
-
         if (isset($options['path'])) $cookie .= '; Path=' . $options['path'];
-
         if (isset($options['secure'])) $cookie .= '; Secure';
-
         if (isset($options['httpOnly'])) $cookie .= '; HttpOnly';
-
         if (isset($options['sameSite'])) $cookie .= '; SameSite=' . $options['sameSite'];
 
         $this->setHeader('Set-Cookie', $cookie);

@@ -204,7 +204,6 @@ final class Request implements RequestInterface
     private function encodeArray(array $array): mixed
     {
         $encode = json_encode($array);
-
         if ($this->app->getOptionsJson()->enable && $encode !== false) {
             return json_decode($encode);
         } else {
@@ -239,10 +238,8 @@ final class Request implements RequestInterface
         if ($accept === null) return true;
 
         $accept = explode(',', $accept);
-
         foreach ($accept as $value) {
             $value = str_replace(' ', '', $value);
-
             if (in_array($value, $types, true)) return true;
         }
 
@@ -255,10 +252,8 @@ final class Request implements RequestInterface
 
         foreach ($headers as $header) {
             $header = explode(':', $header);
-
             if (count($header) === 2) {
                 [$key, $value] = $header;
-
                 if ($key === 'Accept') return $value;
             }
         }
@@ -280,13 +275,11 @@ final class Request implements RequestInterface
         ];
 
         $headers = explode("\r\n", $this->dataClient);
-
         foreach ($headers as $header) {
             $header = explode(':', $header);
 
             if (count($header) === 2) {
                 [$key, $value] = $header;
-
                 $data[$key] = $value;
             }
         }
@@ -294,7 +287,6 @@ final class Request implements RequestInterface
         $options = $this->app->getOptionsJson();
 
         if (Utils::getBytes($data) > $options->limit) return Error::PAYLOAD_TOO_LARGE;
-
         if ($options->reviver !== null && is_callable($options->reviver)) foreach ($data as $key => $value) $data[$key] = call_user_func($options->reviver, $key, $value);
 
         /**
@@ -316,7 +308,6 @@ final class Request implements RequestInterface
 
         if ($options->inflate) {
             if (is_object($data)) $data = (string)json_encode($data);
-
             $data = (string)gzinflate($data);
         }
 
