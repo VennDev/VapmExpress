@@ -236,7 +236,6 @@ final class Response implements ResponseInterface
             $file = $this->app->path() . $path;
 
             if (is_callable($optionsStatic->setHeaders)) call_user_func($optionsStatic->setHeaders, $this, $path, stat($file));
-
             if ($optionsStatic->immutable) $options[] = 'Cache-Control: immutable';
 
             if ($optionsStatic->lastModified) {
@@ -264,12 +263,7 @@ final class Response implements ResponseInterface
         }
 
         if ($status === Status::OK) {
-            if (is_dir($this->path)) {
-                $mime = mime_content_type($this->path);
-            } else {
-                $mime = 'text/html';
-            }
-
+            is_dir($this->path) ? $mime = mime_content_type($this->path) : $mime = 'text/html';
             $options[] = 'Content-Type: ' . $mime;
         }
 

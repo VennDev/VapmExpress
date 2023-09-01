@@ -181,10 +181,7 @@ class Router implements RouterInterface
 
         $canDo = true;
         foreach ($args as $arg) {
-            if (is_callable($arg)) {
-                call_user_func($arg);
-            }
-
+            if (is_callable($arg)) call_user_func($arg);
             if (is_bool($arg) && $arg === false) $canDo = false;
         }
 
@@ -249,7 +246,6 @@ class Router implements RouterInterface
 
             foreach ($explode as $query) {
                 $explodeQuery = explode('=', $query);
-
                 if (count($explodeQuery) === 2) yield $explodeQuery[0] => $explodeQuery[1];
             }
         }
@@ -413,7 +409,6 @@ class Router implements RouterInterface
                         }
 
                         $result = $this->processMiddleware($path, $middleware, $request, $response, $canNext);
-
                         if (!$result) break;
                     }
                 }
